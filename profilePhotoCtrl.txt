@@ -1,0 +1,21 @@
+
+//--------------------------------------------------------------
+//ProfilePhoto upload
+
+const profilePhotoUploadCtrl=expressAsyncHandler(async(req,res)=>{
+  //find login user
+  const {_id}=req.user;
+  //1.get path of img
+  const localPath=`public/images/profile/${req.file.filename}`;
+  //2.upload to cloudinary
+  const imgUploaded=await cloudinaryUploading(localPath);
+  const foundUser=await User.findByIdAndUpdate(
+    _id,{
+      profilePhoto:imgUploaded?.url,
+    },
+    {new:true}
+  );
+  //remove the saved img
+  FileSystem.unlinkSync(localPath);
+  res.json(imgUploaded);
+  });
